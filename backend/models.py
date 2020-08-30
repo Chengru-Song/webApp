@@ -75,6 +75,7 @@ class MobileNetCuda(Model):
         _, indices = torch.sort(output, descending=True)
         return [(labels[idx], percentage[idx].item()) for idx in indices[0][:5]]
 
+
 class DistributedNet(Model):
     def __init__(self):
         super.__init__()

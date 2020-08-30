@@ -31,3 +31,15 @@ Since GPU is a commonly applied approach to speedup training, it is natural to u
 However, the time consumed on inference is reduced significantly due to the application of CUDA. It achieved a remarkable reduction in consumed time. It only takes 0.037294045686722 s on average to analyze an image. That is 36x times faster than just use CPU to classify an image. The comparison of using CPU and CUDA are shown below. 
 
 ![cpu_cuda_comparison](http://showdoc.hypercool.cn:4999/server/../Public/Uploads/2020-08-30/5f4aa104bf7d3.png)
+
+## Accelarate with TensorRT
+
+The pytorch model running with cuda gains a significant improvement on the image classification time. However, a recent approach is deploying TensorRT on the server machine to accelerate the inference process. On TensorRT's website, it can perform up to 40x faster than CPU only systems. Owing to Nvidia's parallel programming model, it provides INT8 and FP16 optimizations for production deployments of deep learning inference applications such as video streaming, speech recognition, recommendation and natural language processing. So I deployed it on the same machine to evaluate the result. Fortunately, the results are quite satisfying. 
+
+When comparing with pytorch's cuda version:
+
+![torch&TensorRT](http://showdoc.hypercool.cn:4999/server/../Public/Uploads/2020-08-30/5f4bc7a0385cd.png)
+
+When comparing them altogether, we got the following result.
+
+![compareAll](http://showdoc.hypercool.cn:4999/server/../Public/Uploads/2020-08-30/5f4bc7a4c6c09.png)
