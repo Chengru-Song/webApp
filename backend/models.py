@@ -74,3 +74,12 @@ class MobileNetCuda(Model):
 
         _, indices = torch.sort(output, descending=True)
         return [(labels[idx], percentage[idx].item()) for idx in indices[0][:5]]
+
+class DistributedNet(Model):
+    def __init__(self):
+        super.__init__()
+        self._model = torch.hub.load('pytorch/vision:v0.6.0', 'mobilenet_v2', pretrained=True)
+        self._model.eval()
+    
+    def predict(self, file):
+        

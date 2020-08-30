@@ -3,6 +3,7 @@ from typing import Optional, Dict, List
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from models import MobileNet, MobileNetCuda
+from config import Settings
 import time
 app = FastAPI()
 
@@ -10,6 +11,8 @@ origins = [
     "http://localhost:8080",
     "http://localhost:8080/#/"
 ]
+
+settings = Settings()
 
 app.add_middleware(
     CORSMiddleware,
