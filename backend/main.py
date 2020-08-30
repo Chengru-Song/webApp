@@ -2,7 +2,7 @@ from fastapi import Depends, FastAPI, Query, Body, File, UploadFile
 from typing import Optional, Dict, List
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from models import MobileNet
+from models import MobileNet, MobileNetCuda
 import time
 app = FastAPI()
 
@@ -86,6 +86,8 @@ async def read_users(commons: dict = Depends(common_parameters)):
 
 # Preload the net to memory
 model = MobileNet()
+
+# model = MobileNetCuda()
 @app.post("/images/")
 async def receive_file(files: List[UploadFile] = File(...)):
     results = []
