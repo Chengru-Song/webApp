@@ -35,6 +35,9 @@
                             <div class="el-upload__tip text-white" slot="tip">Only jpg/png files are accepted，and the file should be less than 10MB</div>
                         </el-upload>
                         <div class="btn-wrapper">
+                            <base-checkbox class="mb-3" v-model="distribute">
+                                <p class="distribute-hint">Use Distributed Lightweight Devices for Bulk Processing</p>
+                            </base-checkbox>
                             <base-button tag="a"
                                          @click="submitUpload"
                                          class="mb-3 mb-sm-0"
@@ -122,7 +125,8 @@ export default {
             //     "class":"Labrador retriever",
             //     "confidence":60.26504135131836
             // }]
-            tableData: []
+            tableData: [],
+            distribute: false
         };
     },
     methods: {
@@ -143,42 +147,44 @@ export default {
             return isLt10M
         },
         submitUpload() {
-            let formData = new FormData()
-            const headerConfig = {headers: {'Content-Type': 'multipart/form-data'}}
+            this.tableData = []
+            if(this.fileList.length == 0) {
+                this.$message.error('No file specified')
+                return
+            }
             let flag = true
             this.fileList.forEach(file => {
                 if(this.acceptFiles.indexOf(file.raw.type) == -1) {
                     flag = false
-                } else {
-                    formData.append('files', file.raw)
                 }
             })
             if(!flag) {
                 this.$message.error('Only accept jpg and png images!')
             }
-            const images = formData.get('files')
-            if(images == null) {
-                this.$message.error('No file specified')
-            } else {
-                axios.post(this.global.baseUrl+"/images/", formData, headerConfig).then(res => {
-                    this.tableData = []
-                    const tableData = res.data.predictions
-                    for(let i=0; i<tableData.length; i++) {
-                        const tempData = []
-                        tableData[i].forEach(predict => {
-                            tempData.push({
-                                "filename": this.fileList[i].name,
-                                "class": predict[0],
-                                "confidence": predict[1]
-                            })
-                        })
-                        this.tableData.push(tempData)
+            
+            if(this.distribute) {
+                console.time('bulk')
+                axios.get(this.global.baseUrl + "/workers/").then(res => {
+                    const workers = res.data.workers
+                    const workersCount = workers.length
+                    const arrList = []
+                    
+                    for(let i=0; i<workersCount; i++) {
+                        arrList.push(new Array())
                     }
-
+                    for(let i=0; i<this.fileList.length; i++) {
+                        arrList[i % workersCount].push(this.fileList[i])
+                    }
+                    for(let i=0; i<workersCount; i++) {
+                        this.sendFiles(arrList[i], workers[i])
+                    }
                 }).catch(err => {
                     console.error(err)
-
                 })
+            } else {
+                console.time('single')
+                this.sendFiles(this.fileList, this.global.baseUrl)
+                
             }
         },
         handlePreview(file) {
@@ -201,8 +207,46 @@ export default {
                     colspan: 0
                 }
             }
-        }
+        },
+        sendFiles(files, url) {
+            if(files.length == 0) return
+            let formData = new FormData()
+            const headerConfig = {headers: {'Content-Type': 'multipart/form-data'}}
+            let flag = true
+            files.forEach(file => {
+                formData.append('files', file.raw)
+                
+            })
+            if(!flag) {
+                this.$message.error('Only accept jpg and png images!')
+            }
+            const images = formData.get('files')
+            if(images == null) {
+                this.$message.error('No file specified')
+            } else {
+                axios.post(url+"/images/", formData, headerConfig).then(res => {
+                    const tableData = res.data.predictions
+                    for(let i=0; i<tableData.length; i++) {
+                        const tempData = []
+                        tableData[i].forEach(predict => {
+                            tempData.push({
+                                "filename": files[i].name,
+                                "class": predict[0],
+                                "confidence": predict[1]
+                            })
+                        })
+                        this.tableData.push(tempData)
+                        if(this.tableData.length == this.fileList.length) {
+                            console.timeEnd('single')
+                            console.timeEnd('bulk')
+                        }
+                    }
 
+                }).catch(err => {
+                    console.error(err)
+                })
+            }
+        }
     }
 };
 </script>
@@ -221,5 +265,8 @@ export default {
 }
 .predict-table {
     margin-top: 2vh;
+}
+.distribute-hint {
+    color: #fff;
 }
 </style>

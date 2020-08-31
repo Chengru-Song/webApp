@@ -24,6 +24,8 @@ After classification, the server deploying Fastapi will reply the client with th
 
 ## Acceleration
 
+### Accelerate with Pytorch Cuda
+
 Since GPU is a commonly applied approach to speedup training, it is natural to use GPU to speed up the inference process. The simplest approach is to use CUDA to accelerate model inference. We only need to switch it to `model.cuda()` to accelerate the process. The images are tested on the same model without changing any network architecture. Therefore, the top-1 and top-5 accuracy remain the same. See the figure below. 
 
 ![accuracy_cuda](http://showdoc.hypercool.cn:4999/server/../Public/Uploads/2020-08-30/5f4a9cbe00209.png)
@@ -32,9 +34,9 @@ However, the time consumed on inference is reduced significantly due to the appl
 
 ![cpu_cuda_comparison](http://showdoc.hypercool.cn:4999/server/../Public/Uploads/2020-08-30/5f4aa104bf7d3.png)
 
-## Accelarate with TensorRT
+### Accelarate with TensorRT
 
-The pytorch model running with cuda gains a significant improvement on the image classification time. However, a recent approach is deploying TensorRT on the server machine to accelerate the inference process. On TensorRT's website, it can perform up to 40x faster than CPU only systems. Owing to Nvidia's parallel programming model, it provides INT8 and FP16 optimizations for production deployments of deep learning inference applications such as video streaming, speech recognition, recommendation and natural language processing. So I deployed it on the same machine to evaluate the result. Fortunately, the results are quite satisfying. 
+The pytorch model running with cuda gains a significant improvement on the image classification time. However, a recent approach is deploying TensorRT on the server machine to accelerate the inference process. On TensorRT's website, it can perform up to 40x faster than CPU only systems. Owing to Nvidia's parallel programming model, it provides INT8 and FP16 optimizations for production deployments of deep learning inference applications such as video streaming, speech recognition, recommendation and natural language processing. So I deployed it on the same machine to evaluate the result. Fortunately, the results are quite satisfying. The average time spent to analyze an image is 0.0008525 s.
 
 When comparing with pytorch's cuda version:
 
@@ -43,3 +45,19 @@ When comparing with pytorch's cuda version:
 When comparing them altogether, we got the following result.
 
 ![compareAll](http://showdoc.hypercool.cn:4999/server/../Public/Uploads/2020-08-30/5f4bc7a4c6c09.png)
+
+### Accelerate with distributed computing
+
+Lightweight models are usually used in video analysis or edge nodes whose computing power are constrained. The aforementioned methods are all accelerating the inference locally using graphic cards. Therefore, if edge nodes could be leveraged to analyze images in a distributed manner, it could gain significantly in performence. As a result, I offer an option for users to choose whether they want to use distributed devices for bulk inference. If selected, the browser will automatically split the input images evenly and send the files to active workers asynchronously. 
+
+We tested the time spent on different sizes of input images. In our test enviroment, workers are set to 3 and the size is ranging from 5-150 images. The results are quite satisfying. 
+
+![single&multiple](http://showdoc.hypercool.cn:4999/server/../Public/Uploads/2020-08-31/5f4c82de2f64a.png)
+
+## Summary
+
+This project is a lightweight image classification web application that returns a possible catogory of an image. We used three methods to accelerate the inference process. The standard time consumed is using a MobileNetv2 model from pytorch to analyze an image on CPU. When enabling CUDA with RTX 2080, the average time consumed to analyze an image is 36x time faster than running on CPU. After applying TensorRT on a MobileNetv2 converted onnx model, the average time spent to analyze an image is 43x time faster than running on pytorch cuda. In addition, we applied distributed inference on images when inputing multiple files at a time. The result is related to the number of workers and network latency which, if properly adjusted, will produce further reduction on the time spent to analyze an image.
+
+## Future Work
+
+Unravel the relationship among network latency, network speed and the number of workers. Analyze the reason why the increase in workers will not decrease the inference time with the same multiple.

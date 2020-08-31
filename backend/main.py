@@ -2,9 +2,11 @@ from fastapi import Depends, FastAPI, Query, Body, File, UploadFile
 from typing import Optional, Dict, List
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from models import MobileNet, MobileNetCuda
+from cpu_model import MobileNet
 from config import Settings
 import time
+
+
 app = FastAPI()
 
 origins = [
@@ -111,3 +113,7 @@ async def receive_file(files: List[UploadFile] = File(...)):
     avgTime /= len(allTime)
     print(avgTime)
     return {"predictions": results}
+
+@app.get("/workers/")
+async def get_workers():
+    return {"workers": settings.workers}
