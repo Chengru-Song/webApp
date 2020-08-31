@@ -1,5 +1,63 @@
 # A Lightweight Image Classification Platform
 
+## Project Structure
+
+
+```
+.
+├── CHANGELOG.md
+├── ISSUE_TEMPLATE.md
+├── README.md
+├── babel.config.js
+├── backend
+│   ├── TensorRT.ipynb
+│   ├── __pycache__
+│   ├── classes.txt             // Imagenet 1000 classes
+│   ├── config.py               // baseURL and worker URLs
+│   ├── cpu_model.py            // Model use CPU
+│   ├── dataset.py  
+│   ├── env.yml                 // Anaconda enviroment
+│   ├── evaluation_results      // Evaluation Result
+│   ├── gpu_models.py           // Model use cuda and tensorRT
+│   ├── main.py                 // FastApi entry
+│   ├── meta.bin
+│   ├── mobilenet.onnx          // ONNX model, converted from pytorch mobilenet
+│   ├── mobilenet_v2            // pytorch mobilenet model
+│   ├── mobilenetv2-7.onnx
+│   ├── newTest.ipynb           // All test and simulation results are generated from this file
+│   ├── result.csv
+│   ├── result2.csv
+│   ├── testMobileNet.ipynb
+│   ├── test_dataset.txt
+│   ├── testimages              // Some hand label images for classification
+│   └── webapp.yml
+├── frontend
+├── package-lock.json
+├── package.json
+├── public
+│   ├── favicon.ico
+│   ├── favicon.png
+│   ├── img
+│   └── index.html
+├── src
+│   ├── App.vue
+│   ├── api
+│   ├── assets
+│   ├── components
+│   ├── directives
+│   ├── layout
+│   ├── main.js
+│   ├── plugins
+│   ├── registerServiceWorker.js
+│   ├── router.js
+│   ├── starterRouter.js
+│   ├── store
+│   ├── utils
+│   └── views
+├── vue.config.js
+└── yarn.lock
+```
+
 ## Features
 - Select from local files to recognize what it is. A mobilenet model is used to predict your input image.
 - Using Different methods to accelerate the inference process.
