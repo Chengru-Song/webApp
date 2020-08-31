@@ -94,7 +94,7 @@ However, the time consumed on inference is reduced significantly due to the appl
 
 ### Accelarate with TensorRT
 
-The pytorch model running with cuda gains a significant improvement on the image classification time. However, a recent approach is deploying TensorRT on the server machine to accelerate the inference process. On TensorRT's website, it can perform up to 40x faster than CPU only systems. Owing to Nvidia's parallel programming model, it provides INT8 and FP16 optimizations for production deployments of deep learning inference applications such as video streaming, speech recognition, recommendation and natural language processing. So I deployed it on the same machine to evaluate the result. Fortunately, the results are quite satisfying. The average time spent to analyze an image is 0.0008525 s.
+The pytorch model running with cuda gains a significant improvement on the image classification time. However, a recent approach is deploying TensorRT on the server machine to accelerate the inference process. As demonstrated on TensorRT website, it can perform up to 40x faster than CPU only systems. Owing to Nvidia's parallel programming model, it provides INT8 and FP16 optimizations for production deployments of deep learning inference applications such as video streaming, speech recognition, recommendation and natural language processing. So I deployed it on the same machine to evaluate this approach. Fortunately, the results are quite satisfying. The average time spent to analyze an image is 0.0008525 s.
 
 When comparing with pytorch's cuda version:
 
@@ -106,9 +106,9 @@ When comparing them altogether, we got the following result.
 
 ### Accelerate with distributed computing
 
-Lightweight models are usually used in video analysis or edge nodes whose computing power are constrained. The aforementioned methods are all accelerating the inference locally using graphic cards. Therefore, if edge nodes could be leveraged to analyze images in a distributed manner, it could gain significantly in performence. As a result, I offer an option for users to choose whether they want to use distributed devices for bulk inference. If selected, the browser will automatically split the input images evenly and send the files to active workers asynchronously. 
+Lightweight models are usually used in video analysis or edge nodes whose computing power are constrained. The aforementioned methods are all accelerating the inference locally using GPU. Therefore, if edge nodes could be leveraged to analyze images in a distributed manner, it could gain significantly in performence. As a result, I offer an option for users to choose whether they want to use distributed devices for bulk inference. If selected, the browser will automatically split the input images evenly and send the files to active workers asynchronously. 
 
-We tested the time spent on different sizes of input images. In our test enviroment, workers are set to 3 and the size is ranging from 5-150 images. The results are quite satisfying. 
+We tested the time spent on different batch sizes of input images. In our test enviroment, workers are set to 3 and the batch size is ranging from 5-150 images. The results are quite satisfying. 
 
 ![single&multiple](http://showdoc.hypercool.cn:4999/server/../Public/Uploads/2020-08-31/5f4c82de2f64a.png)
 
@@ -118,4 +118,4 @@ This project is a lightweight image classification web application that returns 
 
 ## Future Work
 
-Unravel the relationship among network latency, network speed and the number of workers. Analyze the reason why the increase in workers will not decrease the inference time with the same multiple.
+- Unravel the relationship among network latency, network speed and the number of workers. 
